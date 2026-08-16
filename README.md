@@ -402,7 +402,7 @@ uv run streamlit run app.py
 
 A quick walkthrough of query handling, deterministic conversion, and guardrail behavior in the assistant.
 
-<video src="docs/media/Short_Demo_Video.mp4" controls width="960"></video>
+[Play Short Demo Video](docs/media/Short_Demo_Video.mp4)
 
 ### Universal Conversion API
 
