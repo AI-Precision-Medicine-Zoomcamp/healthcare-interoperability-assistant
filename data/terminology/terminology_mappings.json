@@ -1,0 +1,104 @@
+[
+  {
+    "local_code": "GLU_SERUM",
+    "local_description": "Blood glucose serum",
+    "standard_system": "LOINC",
+    "standard_code": "15074-8",
+    "standard_display": "Glucose [Mass/volume] in Serum or Plasma",
+    "notes": "Specimen: Serum/Plasma. Method: Chemistry. Property: Mass concentration.",
+    "alternative_codes": [
+      {
+        "system": "LOINC",
+        "code": "2339-0",
+        "display": "Glucose [Mass/volume] in Blood",
+        "reason": "Use if specimen is whole blood instead of serum."
+      }
+    ]
+  },
+  {
+    "local_code": "WBC_COUNT",
+    "local_description": "White blood cell count",
+    "standard_system": "LOINC",
+    "standard_code": "6690-2",
+    "standard_display": "Leukocytes [#/volume] in Blood by Automated count",
+    "notes": "Specimen: Blood. Method: Automated. Property: Number concentration.",
+    "alternative_codes": []
+  },
+  {
+    "local_code": "RBC_COUNT",
+    "local_description": "Red blood cell count",
+    "standard_system": "LOINC",
+    "standard_code": "789-8",
+    "standard_display": "Erythrocytes [#/volume] in Blood by Automated count",
+    "notes": "Specimen: Blood. Method: Automated.",
+    "alternative_codes": []
+  },
+  {
+    "local_code": "HEMOGLOBIN",
+    "local_description": "Hemoglobin test",
+    "standard_system": "LOINC",
+    "standard_code": "718-7",
+    "standard_display": "Hemoglobin [Mass/volume] in Blood",
+    "notes": "Specimen: Blood. Method: Chemistry.",
+    "alternative_codes": []
+  },
+  {
+    "local_code": "CREATININE",
+    "local_description": "Serum Creatinine",
+    "standard_system": "LOINC",
+    "standard_code": "2160-0",
+    "standard_display": "Creatinine [Mass/volume] in Serum or Plasma",
+    "notes": "Specimen: Serum/Plasma. Essential for calculating eGFR.",
+    "alternative_codes": []
+  },
+  {
+    "local_code": "DIABETES_MELLITUS_T2",
+    "local_description": "Type 2 diabetes mellitus",
+    "standard_system": "SNOMED CT",
+    "standard_code": "44054006",
+    "standard_display": "Type 2 diabetes mellitus",
+    "notes": "Clinical diagnosis code. Hierarchy: Diabetes mellitus -> Endocrine disorder.",
+    "alternative_codes": [
+      {
+        "system": "ICD-10-CM",
+        "code": "E11.9",
+        "display": "Type 2 diabetes mellitus without complications",
+        "reason": "Billing diagnosis code mapping."
+      }
+    ]
+  },
+  {
+    "local_code": "HYPERTENSION",
+    "local_description": "Essential hypertension",
+    "standard_system": "SNOMED CT",
+    "standard_code": "38341003",
+    "standard_display": "Essential hypertension",
+    "notes": "Clinical diagnosis code.",
+    "alternative_codes": [
+      {
+        "system": "ICD-10-CM",
+        "code": "I10",
+        "display": "Essential (primary) hypertension",
+        "reason": "Billing diagnosis code mapping."
+      }
+    ]
+  },
+  {
+    "local_code": "METFORMIN_500",
+    "local_description": "Metformin 500mg oral tablet",
+    "standard_system": "RxNorm",
+    "standard_code": "860975",
+    "standard_display": "Metformin hydrochloride 500 MG Oral Tablet",
+    "notes": "SCD (Semantic Clinical Drug) concept in RxNorm.",
+    "alternative_codes": []
+  },
+  {
+    "local_code": "LISINOPRIL_10",
+    "local_description": "Lisinopril 10mg oral tablet",
+    "standard_system": "RxNorm",
+    "standard_code": "311354",
+    "standard_display": "Lisinopril 10 MG Oral Tablet",
+    "notes": "SCD concept in RxNorm.",
+    "alternative_codes": []
+  }
+]

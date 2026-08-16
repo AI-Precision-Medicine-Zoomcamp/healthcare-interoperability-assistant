@@ -1,0 +1,6 @@
+LocalCode,LocalDescription,MappedLOINC,MandatoryForBilling,Comments
+GLU_SERUM,Blood glucose serum,15074-8,YES,Billing requires LOINC code matching serum specimen
+WBC_COUNT,White blood cell count,6690-2,YES,Auto count method only
+RBC_COUNT,Red blood cell count,789-8,NO,Optional panel component
+HEMOGLOBIN,Hemoglobin test,718-7,YES,Required for anemia panel validation
+CREATININE,Serum Creatinine,2160-0,YES,Must support eGFR calculation triggers

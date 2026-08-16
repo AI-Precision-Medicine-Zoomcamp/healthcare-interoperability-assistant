@@ -1,0 +1,152 @@
+{
+  "segments": {
+    "MSH": {
+      "description": "Message Header Segment",
+      "mappings": [
+        {
+          "v2_field": "MSH-3",
+          "name": "Sending Application",
+          "fhir_path": "MessageHeader.source.name",
+          "type": "HD -> string"
+        },
+        {
+          "v2_field": "MSH-4",
+          "name": "Sending Facility",
+          "fhir_path": "MessageHeader.source.software",
+          "type": "HD -> string",
+          "notes": "Often maps to an Organization reference in clinical context"
+        },
+        {
+          "v2_field": "MSH-7",
+          "name": "Date/Time of Message",
+          "fhir_path": "MessageHeader.meta.lastUpdated",
+          "type": "TS -> instant"
+        },
+        {
+          "v2_field": "MSH-9",
+          "name": "Message Type",
+          "fhir_path": "MessageHeader.eventCoding.code",
+          "type": "MSG -> code",
+          "notes": "Mapped using Message Type ValueSet (e.g. ADT^A08 -> ADT-A08)"
+        },
+        {
+          "v2_field": "MSH-10",
+          "name": "Message Control ID",
+          "fhir_path": "MessageHeader.id",
+          "type": "ST -> id"
+        }
+      ]
+    },
+    "PID": {
+      "description": "Patient Identification Segment",
+      "mappings": [
+        {
+          "v2_field": "PID-3",
+          "name": "Patient Identifier List",
+          "fhir_path": "Patient.identifier",
+          "type": "CX -> Identifier",
+          "notes": "Maps PID-3.1 (ID) to identifier.value, and PID-3.4 (Assigning Authority) to identifier.system OID"
+        },
+        {
+          "v2_field": "PID-5",
+          "name": "Patient Name",
+          "fhir_path": "Patient.name",
+          "type": "XPN -> HumanName",
+          "notes": "Maps PID-5.1 (Family Name) to name.family, and PID-5.2 (Given Name) to name.given"
+        },
+        {
+          "v2_field": "PID-7",
+          "name": "Date/Time of Birth",
+          "fhir_path": "Patient.birthDate",
+          "type": "TS -> date",
+          "notes": "Extracts YYYY-MM-DD from TS"
+        },
+        {
+          "v2_field": "PID-8",
+          "name": "Administrative Sex",
+          "fhir_path": "Patient.gender",
+          "type": "IS -> code",
+          "notes": "Mapped: M -> male, F -> female, O -> other, U -> unknown"
+        },
+        {
+          "v2_field": "PID-11",
+          "name": "Patient Address",
+          "fhir_path": "Patient.address",
+          "type": "XAD -> Address",
+          "notes": "Maps PID-11.1 to address.line, PID-11.3 to address.city, PID-11.4 to address.state, PID-11.5 to address.postalCode"
+        }
+      ]
+    },
+    "PV1": {
+      "description": "Patient Visit Segment",
+      "mappings": [
+        {
+          "v2_field": "PV1-2",
+          "name": "Patient Class",
+          "fhir_path": "Encounter.class",
+          "type": "IS -> Coding",
+          "notes": "Mapped: I -> inpatient, O -> outpatient, E -> emergency, R -> ambulatory"
+        },
+        {
+          "v2_field": "PV1-3",
+          "name": "Assigned Patient Location",
+          "fhir_path": "Encounter.location.location",
+          "type": "PL -> Reference(Location)"
+        },
+        {
+          "v2_field": "PV1-19",
+          "name": "Visit Number",
+          "fhir_path": "Encounter.identifier",
+          "type": "CX -> Identifier",
+          "notes": "Often maps to an encounter or billing account identifier"
+        },
+        {
+          "v2_field": "PV1-44",
+          "name": "Admit Date/Time",
+          "fhir_path": "Encounter.period.start",
+          "type": "TS -> dateTime"
+        }
+      ]
+    },
+    "OBX": {
+      "description": "Observation/Result Segment",
+      "mappings": [
+        {
+          "v2_field": "OBX-2",
+          "name": "Value Type",
+          "fhir_path": "Observation.value[x]",
+          "type": "ID -> Type choice",
+          "notes": "Determines value type: NM -> valueQuantity, ST/TX -> valueString, CE/CWE -> valueCodeableConcept"
+        },
+        {
+          "v2_field": "OBX-3",
+          "name": "Observation Identifier",
+          "fhir_path": "Observation.code",
+          "type": "CWE -> CodeableConcept",
+          "notes": "Maps OBX-3.1 to code.coding.code, OBX-3.2 to code.coding.display, OBX-3.3 to code.coding.system (e.g. LN for LOINC)"
+        },
+        {
+          "v2_field": "OBX-5",
+          "name": "Observation Value",
+          "fhir_path": "Observation.value[x]",
+          "type": "Varies -> choice",
+          "notes": "Value is formatted based on OBX-2"
+        },
+        {
+          "v2_field": "OBX-6",
+          "name": "Units",
+          "fhir_path": "Observation.valueQuantity.unit",
+          "type": "CWE -> string/Coding",
+          "notes": "Maps OBX-6.1 to valueQuantity.unit and valueQuantity.code, OBX-6.3 to valueQuantity.system (UCUM)"
+        },
+        {
+          "v2_field": "OBX-11",
+          "name": "Observation Result Status",
+          "fhir_path": "Observation.status",
+          "type": "ID -> code",
+          "notes": "Mapped: F -> final, C -> corrected, P -> preliminary, X -> cancelled"
+        }
+      ]
+    }
+  }
+}
