@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 
 import requests
-import streamlit as st
 from dotenv import load_dotenv
 
 DEFAULT_API = "http://localhost:8000/api"
@@ -24,6 +23,9 @@ def _read_positive_int_env(key: str, default: int) -> int:
 
 MAX_PDF_UPLOAD_MB = _read_positive_int_env("PDF_UPLOAD_MAX_MB", 5)
 MAX_PDF_UPLOAD_BYTES = MAX_PDF_UPLOAD_MB * 1024 * 1024
+os.environ["STREAMLIT_SERVER_MAX_UPLOAD_SIZE"] = str(MAX_PDF_UPLOAD_MB)
+
+import streamlit as st
 
 st.set_page_config(page_title="Healthcare Interoperability Assistant", page_icon="🩺", layout="wide")
 
@@ -300,7 +302,15 @@ with st.sidebar:
     )
 
     pdf_file = st.file_uploader("Upload PDF", type=["pdf"], accept_multiple_files=False)
-    dedup_mode = st.selectbox("Dedup Mode", ["strict", "none"], index=0)
+    dedup_mode = st.selectbox(
+        "Dedup Mode",
+        ["strict", "none"],
+        index=0,
+        help=(
+            "strict: skips re-ingesting the same document and duplicate chunks across uploads.\n"
+            "none: ingests all chunks even if duplicates already exist."
+        ),
+    )
 
     if st.button("Ingest PDF", use_container_width=True):
         if pdf_file is None:
@@ -433,6 +443,7 @@ if run_clicked:
             try:
                 if is_conversion_mode:
                     body = {
+                        "query": query.strip() or None,
                         "source_format": st.session_state["source_format_input"],
                         "target_format": st.session_state["target_format_input"],
                         "payload": payload.strip(),

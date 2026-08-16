@@ -43,6 +43,7 @@ def query(request: InteroperabilityQueryRequest) -> InteroperabilityQueryRespons
 def convert(request: ConversionRequest) -> ConversionResponse:
     try:
         result = runtime.convert(
+            query=request.query,
             source_format=request.source_format,
             target_format=request.target_format,
             payload=request.payload,

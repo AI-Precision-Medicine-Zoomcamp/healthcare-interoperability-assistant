@@ -22,6 +22,7 @@ class InteroperabilityQueryResponse(BaseModel):
 
 
 class ConversionRequest(BaseModel):
+    query: str | None = Field(default=None, description="Optional user question for conversion intent and guardrail checks")
     source_format: Literal["json", "fhir", "hl7"]
     target_format: Literal["json", "fhir", "hl7"]
     payload: str = Field(..., min_length=2, description="Input payload in source format")

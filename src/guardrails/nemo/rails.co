@@ -1,0 +1,15 @@
+define bot allow_guardrailed_request
+  "__ALLOW_HEALTHCARE_INTEROP_QUERY__"
+
+define bot block_guardrailed_request
+  "__BLOCK__"
+
+define flow self check input
+  $should_block = execute self_check_input
+
+  if $should_block
+    bot block_guardrailed_request
+    stop
+
+  bot allow_guardrailed_request
+  stop

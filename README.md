@@ -288,9 +288,11 @@ This project aims to reduce integration friction by combining retrieval, determi
 - Qdrant-backed vector storage and retrieval (optional FAISS fallback)
 - Metadata-aware retrieval by document type (`fhir_profile`, `hl7_mapping`, `terminology_map`, `organization_rule`)
 - Agent orchestration service with intent routing
+- NeMo Guardrails-based input guardrails for off-topic, secret-extraction, and prompt-injection checks
 - JSON-to-FHIR conversion capability for custom business payloads
 - Universal conversion endpoint for JSON/FHIR/HL7 (`/api/convert`)
 - PDF upload ingestion endpoint with dedup controls (`/api/ingest/pdf`)
+- Lightweight deterministic eval runner for guardrails and conversion paths (`evals/run_evals.py`)
 - FastAPI backend endpoints (`/api/health`, `/api/query`, `/api/convert`, `/api/ingest/pdf`, `/api/reload`)
 - Streamlit frontend with sample loaders and interactive workflow
 - Deterministic helper tools:
@@ -318,6 +320,7 @@ This project aims to reduce integration friction by combining retrieval, determi
 
 - LangChain
 - OpenAI-compatible chat models (OpenAI or Groq endpoint)
+- NeMo Guardrails with Colang input rail definitions
 
 ### Retrieval and Embeddings
 
@@ -395,6 +398,12 @@ uv run streamlit run app.py
 - Health check: http://localhost:8000/api/health
 - Frontend: http://localhost:8501
 
+### Short Demo Video
+
+A quick walkthrough of query handling, deterministic conversion, and guardrail behavior in the assistant.
+
+<video src="docs/media/Short_Demo_Video.mp4" controls width="960"></video>
+
 ### Universal Conversion API
 
 You can convert formats directly with `POST /api/convert`.
@@ -453,19 +462,42 @@ Response includes:
 
 ```mermaid
 flowchart TD
-  A[User Query + Payload/Error] --> B[Intent Routing]
-  B --> C[FHIR Debugging]
-  B --> D[HL7 to FHIR Mapping]
-  B --> E[Terminology Mapping]
-  B --> F[Org-Specific Debugging]
-  C --> G[RAG Retrieval Layer]
-  D --> G
-  E --> G
-  F --> G
-  G --> H[LLM Reasoning with Evidence]
-  H --> I[Correction Proposal]
-  I --> J[Deterministic Validation/Checks]
-  J --> K[Final Explanation + Fix + Validation Result]
+  U[User Input from Streamlit or API] --> V{Endpoint}
+
+  V -->|POST /api/query| Q1[Query + Payload]
+  V -->|POST /api/convert| C1[Format Request + Payload]
+
+  Q1 --> G1[Deterministic Guardrails<br/>secret extraction + prompt injection + off-topic]
+  C1 --> G2[Deterministic Guardrails<br/>secret extraction + prompt injection + off-topic]
+
+  G1 --> G3{Clearly On-Topic?}
+  G3 -->|Yes| I1[Intent Routing]
+  G3 -->|No| N1[NeMo Guardrails Classifier]
+  N1 -->|Allow| I1
+  N1 -->|Block| B1[Refusal Message]
+
+  G2 --> C2[Deterministic JSON/FHIR/HL7 Conversion]
+
+  I1 --> I2[FHIR Debugging]
+  I1 --> I3[HL7 Mapping]
+  I1 --> I4[Terminology Mapping]
+  I1 --> I5[Org-Specific Debugging]
+
+  I2 --> R1[RAG Retrieval Layer]
+  I3 --> R1
+  I4 --> R1
+  I5 --> R1
+
+  R1 --> L1[LLM Reasoning with Evidence]
+  L1 --> D1[Deterministic Validation/Checks]
+  D1 --> O1[Final Explanation + Correction + Citations]
+
+  C2 --> O2[Converted Payload + Notes + Warnings]
+
+  E0[evals/run_evals.py] --> E1[Guardrail Regression Cases]
+  E0 --> E2[Conversion Regression Cases]
+  E1 --> E3[Detect Drift Early]
+  E2 --> E3
 ```
 
 ## Ingestion and Dedup Flow (Architecture)
@@ -513,7 +545,7 @@ Core demo workflow (FHIR-first and integrated):
 | Orchestration and tool flow | Implemented | `src/agents/agent_service.py`, `src/tools/` |
 | Reproducible run/test steps | Implemented | `Quick Start Guide`, `Testing` sections |
 | UI/demo workflow | Implemented | `frontend/app.py` |
-| Automated tests/evals | Planned | `tests/`, `evals/` |
+| Automated tests/evals | Partial | `evals/run_evals.py`, `tests/` |
 
 ## Testing
 
@@ -564,6 +596,19 @@ If ingestion fails:
 3. Confirm network access to Qdrant cluster
 4. Re-run `uv sync` and ingestion
 
+### 5. Eval runner
+
+Run the lightweight deterministic eval suite:
+
+```bash
+uv run python evals/run_evals.py
+```
+
+Current eval coverage includes:
+
+- Query guardrails for allowed healthcare, off-topic, secret-request, and prompt-injection cases
+- Deterministic conversion checks for `json -> fhir`, `fhir -> hl7`, `hl7 -> fhir`, and `json -> hl7`
+
 ## Project Structure
 
 ```text
@@ -579,7 +624,8 @@ healthcare-interoperability-assistant/
 ├── docs/                               # Supporting documentation and run guides
 │   ├── setup.md                        # Environment setup instructions
 │   └── usage.md                        # Example workflows and API usage notes
-├── evals/                              # Evaluation scripts/artifacts (currently empty)
+├── evals/                              # Lightweight evaluation scripts and regression checks
+│   └── run_evals.py                    # Deterministic eval runner for guardrails and conversion flows
 ├── frontend/                           # Streamlit frontend source package
 │   └── app.py                          # Streamlit UI
 ├── src/                                # Core application source code
@@ -591,7 +637,12 @@ healthcare-interoperability-assistant/
 │   │   └── schemas.py                  # Pydantic request/response models
 │   ├── config/                         # Environment/config loading and defaults
 │   │   └── config.py                   # Config loader merging env vars and config.json
-│   ├── guardrails/                     # Guardrail rules and validators (currently empty)
+│   ├── guardrails/                     # Guardrail rules and NeMo Guardrails configuration
+│   │   ├── nemo/                       # NeMo Guardrails YAML and Colang rail definitions
+│   │   │   ├── config.yml              # NeMo model/prompt configuration for input guardrails
+│   │   │   └── rails.co                # Colang rail flow for input guardrail execution
+│   │   ├── nemo_guardrails_service.py  # NeMo Guardrails loader and evaluation adapter
+│   │   └── query_guardrails.py         # Query guardrails for off-topic, secret, and injection detection
 │   ├── llm/                            # LLM client/provider setup and model service logic
 │   │   └── llm_service.py              # LLM and embedding provider initialization
 │   ├── rag/                            # Retrieval pipeline: ingestion, indexing, and runtime retrieval
@@ -640,7 +691,7 @@ Vectorization and indexing are handled by:
 
 ## Limitations
 
-- No formal evaluation scripts are committed under `evals/` yet
+- Only a lightweight deterministic eval runner is committed under `evals/`; no broad benchmark suite yet
 - No automated test suite is committed under `tests/` yet
 - Validation logic is currently simplified for selected constraints
 - Ingestion currently recreates the target Qdrant collection on each run (`force_recreate=True`)

@@ -10,6 +10,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from src.llm.llm_service import LLMService
 from src.rag.rag_service import RAGService
+from src.guardrails.query_guardrails import enforce_query_guardrails
 from src.tools.hl7_tools import HL7Parser
 from src.tools.fhir_tools import FHIRValidator
 
@@ -30,6 +31,13 @@ class AgentService:
         Main orchestration endpoint.
         Routes queries, parses inputs with tools, retrieves RAG context, and calls LLM.
         """
+        enforce_query_guardrails(
+            query=query,
+            payload=payload,
+            capability_hint=capability_hint,
+            profile_url=profile_url,
+        )
+
         # 1. Intent routing
         intent = self._route_intent(query, payload, capability_hint)
         

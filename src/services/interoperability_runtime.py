@@ -14,6 +14,7 @@ from src.config.config import (
     has_openai_api_key,
     has_qdrant_config,
 )
+from src.guardrails.query_guardrails import enforce_query_guardrails
 from src.tools.conversion_tools import FormatConverter
 from src.services.pdf_ingestion_service import PDFIngestionService
 
@@ -83,12 +84,27 @@ class InteroperabilityRuntime:
 
     def convert(
         self,
+        query: str | None,
         source_format: str,
         target_format: str,
         payload: str,
         resource_type: str | None = None,
         message_type: str | None = None,
     ) -> dict[str, Any]:
+        normalized_query = (query or "").strip()
+        guardrail_query = normalized_query or f"Convert payload from {source_format} to {target_format}."
+        guardrail_hint = (
+            f"Healthcare interoperability conversion ({source_format} to {target_format}) "
+            "using JSON/FHIR/HL7 standards."
+        )
+
+        enforce_query_guardrails(
+            query=guardrail_query,
+            payload=payload,
+            capability_hint=guardrail_hint,
+            enable_nemo=False,
+        )
+
         return FormatConverter.convert(
             source_format=source_format,
             target_format=target_format,
