@@ -402,7 +402,15 @@ uv run streamlit run app.py
 
 A quick walkthrough of query handling, deterministic conversion, and guardrail behavior in the assistant.
 
+[![Open Demo Video](https://img.shields.io/badge/Open%20Demo%20Video-Fullscreen-1f6feb?style=for-the-badge&logo=github)](docs/media/Short_Demo_Video.mp4)
+
+See the complete workflow from input to validated output.
+
 [![Short Demo Video Preview](docs/media/Short_Demo_Video_preview.gif)](docs/media/Short_Demo_Video.mp4)
+
+Example result screen from the assistant after processing a healthcare interoperability request.
+
+[![Demo Example Screenshot](docs/media/demo_example_screenshot.png)](docs/media/demo_example_screenshot.png)
 
 ### Universal Conversion API
 
