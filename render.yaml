@@ -5,6 +5,7 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile.backend
     dockerContext: .
+    dockerCommand: sh -c "/app/.venv/bin/uvicorn src.api.app:app --host 0.0.0.0 --port ${PORT:-8000}"
     healthCheckPath: /api/health/live
     autoDeployTrigger: commit
     envVars:
@@ -39,6 +40,7 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile.frontend
     dockerContext: .
+    dockerCommand: sh -c "/app/.venv/bin/streamlit run app.py --server.address=0.0.0.0 --server.port=${PORT:-8501}"
     healthCheckPath: /_stcore/health
     autoDeployTrigger: commit
     envVars:
