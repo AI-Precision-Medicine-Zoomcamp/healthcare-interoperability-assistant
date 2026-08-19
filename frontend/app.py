@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-DEFAULT_API = "http://localhost:8000/api"
+DEFAULT_API = os.getenv("API_BASE_URL", "http://localhost:8000/api")
 ROOT_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT_DIR / ".env")
 

@@ -1,0 +1,15 @@
+.git
+.gitignore
+.venv
+.pytest_cache
+.vscode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+.env
+.env.*
+!.env.example
+data/cache/
+frontend/.streamlit/

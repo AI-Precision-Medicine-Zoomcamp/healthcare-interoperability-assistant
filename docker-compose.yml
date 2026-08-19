@@ -1,0 +1,89 @@
+name: healthcare-interoperability-assistant
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - hf_cache:/home/appuser/.cache/huggingface
+      - app_cache:/app/data/cache
+    networks:
+      - interop-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    env_file:
+      - .env
+    environment:
+      API_BASE_URL: http://backend:8000/api
+      STREAMLIT_SERVER_ADDRESS: 0.0.0.0
+      STREAMLIT_SERVER_PORT: "8501"
+      STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+    ports:
+      - "8501:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - interop-net
+
+  ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    env_file:
+      - .env
+    command: ["uv", "run", "python", "-m", "src.rag.ingest"]
+    profiles:
+      - ingest
+    restart: "no"
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - interop-net
+
+networks:
+  interop-net:
+    driver: bridge
+
+volumes:
+  hf_cache:
+  app_cache:

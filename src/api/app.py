@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,9 +13,17 @@ app = FastAPI(
     description="Unified interoperability API for RAG assistance, deterministic format conversion, and PDF ingestion to Qdrant.",
 )
 
+
+def _cors_origins_from_env() -> list[str]:
+    raw = os.getenv("CORS_ALLOW_ORIGINS", "*").strip()
+    if not raw:
+        return ["*"]
+    origins = [origin.strip() for origin in raw.split(",") if origin.strip()]
+    return origins or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins_from_env(),
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -398,6 +398,74 @@ uv run streamlit run app.py
 - Health check: http://localhost:8000/api/health
 - Frontend: http://localhost:8501
 
+### Running with Docker Compose
+
+This repository includes an enterprise-ready Docker baseline:
+
+- `docker-compose.yml`: default stack (backend + frontend + optional ingestion job)
+- `docker-compose.prod.yml`: production overrides (internal backend port, read-only filesystem, tmpfs)
+- `Dockerfile.backend` and `Dockerfile.frontend`: isolated service images with non-root users and health checks
+
+1. Copy and update environment values:
+
+```bash
+cp .env.example .env
+```
+
+Required values in `.env`:
+
+- `OPENAI_API_KEY` or `GROQ_API_KEY`
+- `QDRANT_URL`
+- `QDRANT_API_KEY` (or `QDARNT_API_KEY`)
+
+Recommended values for deployment:
+
+- `API_BASE_URL=http://backend:8000/api` (used by frontend container)
+- `CORS_ALLOW_ORIGINS=https://your-frontend-domain.com`
+
+2. Build and start the default stack:
+
+```bash
+docker compose up --build -d
+```
+
+3. Verify services:
+
+```bash
+docker compose ps
+docker compose logs backend --tail=100
+docker compose logs frontend --tail=100
+```
+
+4. Open locally:
+
+- API docs: http://localhost:8000/docs
+- Health check: http://localhost:8000/api/health
+- Frontend: http://localhost:8501
+
+5. Stop stack:
+
+```bash
+docker compose down
+```
+
+Optional one-time ingestion job via compose profile:
+
+```bash
+docker compose --profile ingest run --rm ingest
+```
+
+Production-style run with overrides:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
+
+Notes:
+
+- Backend is bound to loopback (`127.0.0.1`) in production override, reducing external surface while keeping host-level diagnostics available.
+- Set `CORS_ALLOW_ORIGINS` to explicit domains in production instead of `*`.
+
 ### Short Demo Video
 
 A quick walkthrough of query handling, deterministic conversion, and guardrail behavior in the assistant.
@@ -617,11 +685,38 @@ Current eval coverage includes:
 - Query guardrails for allowed healthcare, off-topic, secret-request, and prompt-injection cases
 - Deterministic conversion checks for `json -> fhir`, `fhir -> hl7`, `hl7 -> fhir`, and `json -> hl7`
 
+### 6. Docker stack test
+
+Run these checks after `docker compose up --build -d`:
+
+```bash
+docker compose ps
+curl http://localhost:8000/api/health
+curl http://localhost:8501/_stcore/health
+```
+
+Expected:
+
+- Backend container is `healthy`
+- Frontend container is `healthy`
+- API health JSON returns `ready: true` when keys/vector DB are configured
+
+Cleanup:
+
+```bash
+docker compose down
+```
+
 ## Project Structure
 
 ```text
 healthcare-interoperability-assistant/
 ├── app.py                              # Root Streamlit launcher entry point
+├── Dockerfile.backend                  # Backend container image definition (FastAPI)
+├── Dockerfile.frontend                 # Frontend container image definition (Streamlit)
+├── docker-compose.yml                  # Default compose stack (backend/frontend/optional ingest)
+├── docker-compose.prod.yml             # Production-focused compose overrides
+├── .dockerignore                       # Docker build context exclusions
 ├── data/                               # Local datasets, downloaded artifacts, and vector data inputs
 │   ├── cache/                          # Temporary cached files from dataset fetch/preprocessing
 │   ├── fhir/                           # FHIR StructureDefinitions, ValueSets, and profile source files
