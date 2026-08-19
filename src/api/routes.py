@@ -16,6 +16,11 @@ from src.services.interoperability_runtime import runtime
 router = APIRouter(prefix="/api", tags=["assistant"])
 
 
+@router.get("/health/live")
+def health_live() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 @router.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(**runtime.health())

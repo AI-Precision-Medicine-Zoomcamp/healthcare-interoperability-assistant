@@ -5,7 +5,7 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile.backend
     dockerContext: .
-    healthCheckPath: /api/health
+    healthCheckPath: /api/health/live
     autoDeployTrigger: commit
     envVars:
       - key: OPENAI_API_KEY
