@@ -2,7 +2,7 @@ services:
   - type: web
     name: healthcare-interoperability-backend
     runtime: docker
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile.backend
     dockerContext: .
     healthCheckPath: /api/health
@@ -38,7 +38,7 @@ services:
   - type: web
     name: healthcare-interoperability-frontend
     runtime: docker
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile.frontend
     dockerContext: .
     healthCheckPath: /_stcore/health

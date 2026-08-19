@@ -505,7 +505,7 @@ The frontend service discovers the backend via Render private networking using `
 
 Important:
 
-- Free plans can sleep and cold-start; use `starter` or higher for better reliability.
+- Blueprint is configured with `free` plan for both frontend and backend. Free instances can sleep and may cold-start.
 - If CORS errors appear, update `CORS_ALLOW_ORIGINS` on backend to exactly match frontend origin.
 - If backend `ready=false`, verify keys and Qdrant access in Render env settings.
 
