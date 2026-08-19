@@ -473,7 +473,7 @@ This repository now includes a Render Blueprint file at [render.yaml](render.yam
 - `healthcare-interoperability-backend` (FastAPI)
 - `healthcare-interoperability-frontend` (Streamlit)
 
-The frontend service discovers the backend via Render private networking using `BACKEND_HOST` and `BACKEND_PORT`, so no hardcoded backend URL is required.
+The frontend service uses `API_BASE_URL` pointing to the backend's public Render URL.
 
 1. Push your latest code to GitHub.
 
@@ -498,14 +498,22 @@ The frontend service discovers the backend via Render private networking using `
 
 5. Deploy and verify:
 
-- Backend health endpoint: `https://<backend-service>.onrender.com/api/health`
+- Backend health endpoint (liveness): `https://<backend-service>.onrender.com/api/health/live`
+- Backend readiness endpoint: `https://<backend-service>.onrender.com/api/health`
 - Frontend health endpoint: `https://<frontend-service>.onrender.com/_stcore/health`
 
 6. Open frontend service URL and run `Check Health` in the sidebar.
 
+#### Frontend UI URL
+
+If service names are unchanged from this blueprint, open:
+
+- `https://healthcare-interoperability-frontend.onrender.com/`
+
 Important:
 
 - Blueprint is configured with `free` plan for both frontend and backend. Free instances can sleep and may cold-start.
+- Free plan has limited resources (memory/CPU). In many workspaces this is around 1 GB RAM; confirm exact limits in your Render dashboard.
 - Docker images are configured to bind to Render's `PORT` environment variable automatically.
 - If CORS errors appear, update `CORS_ALLOW_ORIGINS` on backend to exactly match frontend origin.
 - If backend `ready=false`, verify keys and Qdrant access in Render env settings.

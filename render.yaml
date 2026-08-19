@@ -42,16 +42,8 @@ services:
     healthCheckPath: /_stcore/health
     autoDeployTrigger: commit
     envVars:
-      - key: BACKEND_HOST
-        fromService:
-          type: web
-          name: healthcare-interoperability-backend
-          property: host
-      - key: BACKEND_PORT
-        fromService:
-          type: web
-          name: healthcare-interoperability-backend
-          property: port
+      - key: API_BASE_URL
+        value: https://healthcare-interoperability-backend.onrender.com/api
       - key: PDF_UPLOAD_MAX_MB
         value: "5"
       - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
