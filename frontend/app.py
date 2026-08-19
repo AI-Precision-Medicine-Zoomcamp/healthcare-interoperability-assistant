@@ -7,9 +7,24 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-DEFAULT_API = os.getenv("API_BASE_URL", "http://localhost:8000/api")
 ROOT_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT_DIR / ".env")
+
+
+def _resolve_default_api() -> str:
+    explicit = os.getenv("API_BASE_URL", "").strip()
+    if explicit:
+        return explicit
+
+    host = os.getenv("BACKEND_HOST", "").strip()
+    port = os.getenv("BACKEND_PORT", "").strip()
+    if host and port:
+        return f"http://{host}:{port}/api"
+
+    return "http://localhost:8000/api"
+
+
+DEFAULT_API = _resolve_default_api()
 
 
 def _read_positive_int_env(key: str, default: int) -> int:

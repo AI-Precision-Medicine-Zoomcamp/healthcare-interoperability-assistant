@@ -466,6 +466,49 @@ Notes:
 - Backend is bound to loopback (`127.0.0.1`) in production override, reducing external surface while keeping host-level diagnostics available.
 - Set `CORS_ALLOW_ORIGINS` to explicit domains in production instead of `*`.
 
+### Deploying to Render
+
+This repository now includes a Render Blueprint file at [render.yaml](render.yaml) with two web services:
+
+- `healthcare-interoperability-backend` (FastAPI)
+- `healthcare-interoperability-frontend` (Streamlit)
+
+The frontend service discovers the backend via Render private networking using `BACKEND_HOST` and `BACKEND_PORT`, so no hardcoded backend URL is required.
+
+1. Push your latest code to GitHub.
+
+2. In Render Dashboard, choose:
+
+- `New` -> `Blueprint`
+- Select this repository and branch
+- Confirm Render detects [render.yaml](render.yaml)
+
+3. During first Blueprint creation, provide secret values for `sync: false` keys:
+
+- `OPENAI_API_KEY` or `GROQ_API_KEY`
+- `QDRANT_URL`
+- `QDRANT_API_KEY` (or keep `QDARNT_API_KEY` for compatibility)
+- `CORS_ALLOW_ORIGINS` (set to your frontend Render URL)
+
+4. Keep default non-secret values unless you have custom settings:
+
+- `VECTOR_DB_PROVIDER=qdrant`
+- `QDRANT_COLLECTION_NAME=healthcare_interop_assistant`
+- `PDF_UPLOAD_MAX_MB=5`
+
+5. Deploy and verify:
+
+- Backend health endpoint: `https://<backend-service>.onrender.com/api/health`
+- Frontend health endpoint: `https://<frontend-service>.onrender.com/_stcore/health`
+
+6. Open frontend service URL and run `Check Health` in the sidebar.
+
+Important:
+
+- Free plans can sleep and cold-start; use `starter` or higher for better reliability.
+- If CORS errors appear, update `CORS_ALLOW_ORIGINS` on backend to exactly match frontend origin.
+- If backend `ready=false`, verify keys and Qdrant access in Render env settings.
+
 ### Short Demo Video
 
 A quick walkthrough of query handling, deterministic conversion, and guardrail behavior in the assistant.
