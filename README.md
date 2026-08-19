@@ -504,9 +504,9 @@ The frontend service uses `API_BASE_URL` pointing to the backend's public Render
 
 6. Open frontend service URL and run `Check Health` in the sidebar.
 
-#### Frontend UI URL
+### Frontend UI URL
 
-If service names are unchanged from this blueprint, open:
+This project is deployed on Render. Open the frontend at:
 
 - `https://healthcare-interoperability-frontend.onrender.com/`
 
